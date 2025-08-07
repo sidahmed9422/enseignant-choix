@@ -1035,7 +1035,7 @@
         const scriptURL = "https://script.google.com/macros/s/AKfycbyOyJuvYV8lBiLOCpjKgJKGz_zU7kvv3FdTMo9SQzw9Z6qttVafxbh6TXSg6x6uV0ib/exec";
 
         // Envoi des données à Google Sheets
-     document.getElementById('selectionForm').addEventListener('submit', function(e) {
+   document.getElementById('selectionForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const teacherName = document.getElementById('teacherName').value.trim();
@@ -1058,20 +1058,6 @@
             console.error("Erreur !", error.message);
         });
 });
-            // Réinitialisation du formulaire
-            document.getElementById('teacherName').value = '';
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                cb.checked = false;
-            });
-            selectedChoices = [];
-            updateSelection();
-        })
-        .catch(error => {
-            alert("Erreur lors de l’envoi. Veuillez réessayer.");
-            console.error("Erreur:", error);
-        });
-    });
-
     // Initialisation
     updateSelection();
 
