@@ -955,116 +955,96 @@
     </div>
 
 <script>
-    let selectedChoices = [];
+        let selectedChoices = [];
 
-    function toggleCheckbox(container) {
-        const checkbox = container.querySelector('input[type="checkbox"]');
-        checkbox.checked = !checkbox.checked;
-        updateSelection();
-    }
-
-    function updateSelection() {
-        const checkboxes = document.querySelectorAll('input[name="selection"]');
-        selectedChoices = [];
-
-        checkboxes.forEach(checkbox => {
-            const container = checkbox.closest('.checkbox-container');
-            if (checkbox.checked) {
-                selectedChoices.push(checkbox.value);
-                container.classList.add('checked');
-            } else {
-                container.classList.remove('checked');
-            }
-        });
-
-        updateSummary();
-    }
-
-    function updateSummary() {
-        const countElement = document.getElementById('selectedCount');
-        const listElement = document.getElementById('selectedList');
-        const submitBtn = document.getElementById('submitBtn');
-        const errorMessage = document.getElementById('errorMessage');
-
-        countElement.textContent = selectedChoices.length;
-
-        if (selectedChoices.length === 0) {
-            listElement.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7);">Aucune sélection pour le moment</div>';
-        } else {
-            listElement.innerHTML = selectedChoices.map(choice =>
-                `<div class="selected-item">✓ ${choice}</div>`
-            ).join('');
+        function toggleCheckbox(container) {
+            const checkbox = container.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            updateSelection();
         }
 
-        if (selectedChoices.length >= 5) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Valider ma sélection';
-            errorMessage.style.display = 'none';
-        } else {
-            submitBtn.disabled = true;
-            submitBtn.textContent = `Sélectionnez ${5 - selectedChoices.length} choix de plus`;
-            errorMessage.style.display = 'none';
-        }
-    }
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('input[name="selection"]');
+            selectedChoices = [];
+            
+            checkboxes.forEach(checkbox => {
+                const container = checkbox.closest('.checkbox-container');
+                if (checkbox.checked) {
+                    selectedChoices.push(checkbox.value);
+                    container.classList.add('checked');
+                } else {
+                    container.classList.remove('checked');
+                }
+            });
 
-    document.getElementById('selectionForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const teacherName = document.getElementById('teacherName').value.trim();
-
-        if (!teacherName) {
-            alert('Veuillez entrer votre nom complet.');
-            document.getElementById('teacherName').focus();
-            return;
+            updateSummary();
         }
 
-        if (selectedChoices.length < 5) {
+        function updateSummary() {
+            const countElement = document.getElementById('selectedCount');
+            const listElement = document.getElementById('selectedList');
+            const submitBtn = document.getElementById('submitBtn');
             const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = 'Vous devez sélectionner au moins 5 choix avant de valider.';
-            errorMessage.style.display = 'block';
-            return;
+
+            countElement.textContent = selectedChoices.length;
+
+            if (selectedChoices.length === 0) {
+                listElement.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7);">Aucune sélection pour le moment</div>';
+            } else {
+                listElement.innerHTML = selectedChoices.map(choice => 
+                    <div class="selected-item">✓ ${choice}</div>
+                ).join('');
+            }
+
+            if (selectedChoices.length >= 5) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Valider ma sélection';
+                errorMessage.style.display = 'none';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.textContent = Sélectionnez ${5 - selectedChoices.length} choix de plus;
+                errorMessage.style.display = 'none';
+            }
         }
 
-        // Données à envoyer à Google Sheets
-        const data = {
-            teacherName: teacherName,
-            selections: selectedChoices.join(", ")
-        };
+        document.getElementById('selectionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const teacherName = document.getElementById('teacherName').value.trim();
+            
+            if (!teacherName) {
+                alert('Veuillez entrer votre nom complet.');
+                document.getElementById('teacherName').focus();
+                return;
+            }
+            
+            if (selectedChoices.length < 5) {
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Vous devez sélectionner au moins 5 choix avant de valider.';
+                errorMessage.style.display = 'block';
+                return;
+            }
 
-        // ⚠️ Remplace ceci par l'URL de ton script Google Apps Script
-        const scriptURL = "https://script.google.com/macros/s/AKfycbyOyJuvYV8lBiLOCpjKgJKGz_zU7kvv3FdTMo9SQzw9Z6qttVafxbh6TXSg6x6uV0ib/exec";
-
-        // Envoi des données à Google Sheets
-   document.getElementById('selectionForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const teacherName = document.getElementById('teacherName').value.trim();
-
-    if (!teacherName || selectedChoices.length < 5) {
-        alert("Nom manquant ou pas assez de choix.");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("name", teacherName);
-    formData.append("selections", selectedChoices.join(','));
-
-    fetch(scriptURL, { method: 'POST', body: formData })
-        .then(response => response.text())
-        .then(result => {
-            alert("Données envoyées avec succès !");
-        })
-        .catch(error => {
-            console.error("Erreur !", error.message);
+            // Simulation d'envoi - ici vous pourriez envoyer les données à un serveur
+            const summary = Sélection validée avec succès pour ${teacherName}!\n\nChoix sélectionnés:\n${selectedChoices.join('\n')};
+            alert(summary);
+            
+            // Reset du formulaire
+            document.getElementById('teacherName').value = '';
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            selectedChoices = [];
+            updateSelection();
         });
-});
-    // Initialisation
-    updateSelection();
 
-    // Gestion des checkbox avec les clics sur les labels
-    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateSelection);
-    });
-</script>
+        // Initialisation
+        updateSelection();
+
+        // Gestion des checkbox avec les clics sur les labels
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelection);
+        });
+    </script>
 </body>
 </html>
