@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formulaire de Sélection des Matières</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 800px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .section {
+      margin-top: 30px;
+    }
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Formulaire de Sélection des Matières</h1>
+
+<form id="matiereForm">
+  <label for="enseignant">Nom de l'enseignant :</label>
+  <input type="text" id="enseignant" name="enseignant" required>
+
+  <label for="email">Adresse email :</label>
+  <input type="email" id="email" name="email" required>
+
+  <!-- Semestre 3 MA -->
+  <div class="section">
+    <h3>Semestre 3 MA</h3>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="matiere" value="Algèbre 3"> Algèbre 3</label>
+      <label><input type="checkbox" name="matiere" value="Analyse 3"> UEF312 : Analyse 3</label>
+      <label><input type="checkbox" name="matiere" value="Topologie"> UEF313 : Introduction à la topologie</label>
+      <label><input type="checkbox" name="matiere" value="Analyse numérique 1"> UEM311 : Analyse numérique 1</label>
+      <label><input type="checkbox" name="matiere" value="Logique Mathématique"> UEM312 : Logique Mathématique</label>
+      <label><input type="checkbox" name="matiere" value="Calcul scientifique Python"> UEM313 : Calcul scientifique avancé avec Python</label>
+      <label><input type="checkbox" name="matiere" value="LaTeX"> UD311 : Introduction à LaTeX</label>
+    </div>
+  </div>
+
+  <!-- Semestre 5 MA -->
+  <div class="section">
+    <h3>Semestre 5 MA</h3>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="matiere" value="Probabilités avancées"> UEF511 : Probabilités avancées</label>
+      <label><input type="checkbox" name="matiere" value="Statistique paramétrique"> UEF512 : Statistique paramétrique</label>
+      <label><input type="checkbox" name="matiere" value="Mesure et intégration"> UEF513 : Mesure et intégration</label>
+      <label><input type="checkbox" name="matiere" value="Systèmes et BD"> UEM511 : Systèmes d’informations et bases de données</label>
+      <label><input type="checkbox" name="matiere" value="Analyse exploratoire"> UEM512 : Analyse exploratoire de données</label>
+      <label><input type="checkbox" name="matiere" value="Didactique"> UED511 : Initiation à la didactique des Mathématiques</label>
+    </div>
+  </div>
+
+  <!-- Master PS S1 -->
+  <div class="section">
+    <h3>MASTER PS S1</h3>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="matiere" value="Probabilités 1"> Probabilités 1</label>
+      <label><input type="checkbox" name="matiere" value="Mesure et Intégration"> Mesure et Intégration</label>
+      <label><input type="checkbox" name="matiere" value="Analyse Fonctionnelle"> Analyse Fonctionnelle</label>
+      <label><input type="checkbox" name="matiere" value="Statistique Paramétrique"> Statistique Paramétrique</label>
+      <label><input type="checkbox" name="matiere" value="Économie finances"> Économie finances</label>
+      <label><input type="checkbox" name="matiere" value="Programmation R"> Programmation logiciel R</label>
+      <label><input type="checkbox" name="matiere" value="Anglais Technique"> Anglais Technique</label>
+      <label><input type="checkbox" name="matiere" value="Latex1"> Latex1</label>
+    </div>
+  </div>
+
+  <!-- Master PS S3 -->
+  <div class="section">
+    <h3>MASTER PS S3</h3>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="matiere" value="Statistique fonctionnelle"> Statistique fonctionnelle</label>
+      <label><input type="checkbox" name="matiere" value="Calcul stochastique"> Calcul stochastique</label>
+      <label><input type="checkbox" name="matiere" value="Fiabilité et qualité"> Fiabilité et qualité</label>
+      <label><input type="checkbox" name="matiere" value="Méthodes de Monte Carlo"> Méthodes de Monte Carlo</label>
+      <label><input type="checkbox" name="matiere" value="Analyse des Données Avancées"> Analyse des Données Avancées</label>
+      <label><input type="checkbox" name="matiere" value="Entrepreneuriat"> Entrepreneuriat</label>
+    </div>
+  </div>
+
+  <button type="submit">Envoyer</button>
+</form>
+
+<script>
+  document.getElementById('matiereForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    alert("Formulaire soumis ! (pas encore connecté à Google Sheets)");
+  });
+</script>
+
+</body>
+</html>
