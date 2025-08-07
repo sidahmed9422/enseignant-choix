@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -938,7 +937,7 @@
          
                 </div>
             </div>
-          <div class="summary">
+        <div class="summary">
                 <h3>📋 Résumé de votre sélection</h3>
                 <div class="counter" id="counter">
                     Choix sélectionnés: <span id="selectedCount">0</span> / 5 minimum
@@ -992,7 +991,7 @@
                 listElement.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7);">Aucune sélection pour le moment</div>';
             } else {
                 listElement.innerHTML = selectedChoices.map(choice => 
-                    <div class="selected-item">✓ ${choice}</div>
+                    `<div class="selected-item">✓ ${choice}</div>`
                 ).join('');
             }
 
@@ -1002,7 +1001,7 @@
                 errorMessage.style.display = 'none';
             } else {
                 submitBtn.disabled = true;
-                submitBtn.textContent = Sélectionnez ${5 - selectedChoices.length} choix de plus;
+                submitBtn.textContent = `Sélectionnez ${5 - selectedChoices.length} choix de plus`;
                 errorMessage.style.display = 'none';
             }
         }
@@ -1026,7 +1025,7 @@
             }
 
             // Simulation d'envoi - ici vous pourriez envoyer les données à un serveur
-            const summary = Sélection validée avec succès pour ${teacherName}!\n\nChoix sélectionnés:\n${selectedChoices.join('\n')};
+            const summary = `Sélection validée avec succès pour ${teacherName}!\n\nChoix sélectionnés:\n${selectedChoices.join('\n')}`;
             alert(summary);
             
             // Reset du formulaire
