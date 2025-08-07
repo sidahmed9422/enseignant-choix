@@ -1035,17 +1035,29 @@
         const scriptURL = "https://script.google.com/macros/s/AKfycbyOyJuvYV8lBiLOCpjKgJKGz_zU7kvv3FdTMo9SQzw9Z6qttVafxbh6TXSg6x6uV0ib/exec";
 
         // Envoi des données à Google Sheets
-        fetch(scriptURL, {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
+     document.getElementById('selectionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const teacherName = document.getElementById('teacherName').value.trim();
+
+    if (!teacherName || selectedChoices.length < 5) {
+        alert("Nom manquant ou pas assez de choix.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", teacherName);
+    formData.append("selections", selectedChoices.join(','));
+
+    fetch(scriptURL, { method: 'POST', body: formData })
         .then(response => response.text())
-        .then(responseText => {
-            alert(`Merci ${teacherName}, vos choix ont été enregistrés avec succès.`);
-            
+        .then(result => {
+            alert("Données envoyées avec succès !");
+        })
+        .catch(error => {
+            console.error("Erreur !", error.message);
+        });
+});
             // Réinitialisation du formulaire
             document.getElementById('teacherName').value = '';
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
