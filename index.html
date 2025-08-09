@@ -927,7 +927,7 @@
          
                 </div>
             </div>
-         <!-- Résumé des sélections -->
+            <!-- Résumé des sélections -->
             <div class="summary">
                 <h3>📊 Résumé de vos choix</h3>
                 <div class="counter" id="selectionCounter">0 choix sélectionnés</div>
@@ -954,7 +954,7 @@
     </div>
 
     <script>
-        // Configuration Google Sheets - REMPLACEZ PAR VOTRE URL !
+        // Configuration Google Sheets - VOTRE URL ACTUELLE
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGj2qFFhQhbRY6kjVDsvXgmwgREe4XBJWGzhpr5pMlkYNMqd3JjEw_DbeeXP34mTfP/exec';
         
         let selectedItems = [];
@@ -991,19 +991,24 @@
                 list.appendChild(div);
             });
             
-            // Activer le bouton si au moins 5 choix
             submitBtn.disabled = selectedItems.length < 5;
         }
 
-        // Gestion du formulaire
+        // Gestion du formulaire avec méthodes multiples
         document.getElementById('selectionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const teacherName = document.getElementById('teacherName').value;
-            const teacherEmail = document.getElementById('teacherEmail').value;
+            const teacherName = document.getElementById('teacherName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
             
+            // Validations
             if (!teacherName || !teacherEmail) {
                 showMessage('error', 'Veuillez remplir tous les champs obligatoires.');
+                return;
+            }
+            
+            if (!isValidEmail(teacherEmail)) {
+                showMessage('error', 'Veuillez entrer un email valide.');
                 return;
             }
             
@@ -1016,8 +1021,9 @@
             document.getElementById('loading').style.display = 'block';
             document.getElementById('submitBtn').disabled = true;
             
+            console.log('🚀 Début envoi des données...');
+            
             try {
-                // Préparer les données pour Google Sheets
                 const formData = {
                     timestamp: new Date().toISOString(),
                     teacherName: teacherName,
@@ -1026,52 +1032,168 @@
                     totalSelections: selectedItems.length
                 };
                 
-                // Envoyer vers Google Apps Script
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
+                console.log('📦 Données à envoyer:', formData);
                 
-                if (response.ok) {
-                    showMessage('success', 'Votre sélection a été enregistrée avec succès !');
-                    // Reset form
+                // Méthode 1: Essayer avec POST JSON
+                let response = await sendWithJSON(formData);
+                
+                // Méthode 2: Si échec, essayer avec FormData
+                if (!response.success) {
+                    console.log('⚠️ Méthode JSON échouée, essai avec FormData...');
+                    response = await sendWithFormData(formData);
+                }
+                
+                // Méthode 3: Si toujours échec, essayer avec GET
+                if (!response.success) {
+                    console.log('⚠️ Méthode FormData échouée, essai avec GET...');
+                    response = await sendWithGET(formData);
+                }
+                
+                if (response.success) {
+                    showMessage('success', '✅ Votre sélection a été enregistrée avec succès !');
                     resetForm();
                 } else {
-                    throw new Error('Erreur serveur');
+                    throw new Error(response.message || response.error || 'Erreur inconnue');
                 }
                 
             } catch (error) {
-                console.error('Erreur:', error);
-                showMessage('error', 'Erreur lors de l\'envoi. Veuillez réessayer.');
+                console.error('❌ Erreur finale:', error);
+                showMessage('error', `❌ Erreur lors de l'envoi: ${error.message}. Veuillez réessayer ou contacter l'administrateur.`);
             } finally {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('submitBtn').disabled = false;
             }
         });
 
+        // Méthode 1: Envoi avec JSON
+        async function sendWithJSON(data) {
+            try {
+                console.log('📡 Envoi avec JSON...');
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                    mode: 'cors'
+                });
+                
+                const result = await response.text();
+                console.log('📨 Réponse brute:', result);
+                
+                try {
+                    const jsonResult = JSON.parse(result);
+                    console.log('✅ JSON parsé:', jsonResult);
+                    return jsonResult;
+                } catch {
+                    if (result.includes('success') || response.ok) {
+                        return { success: true, message: 'Données envoyées' };
+                    }
+                    return { success: false, error: 'Réponse invalide: ' + result.substring(0, 100) };
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur méthode JSON:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Méthode 2: Envoi avec FormData
+        async function sendWithFormData(data) {
+            try {
+                console.log('📡 Envoi avec FormData...');
+                const formData = new FormData();
+                formData.append('teacherName', data.teacherName);
+                formData.append('teacherEmail', data.teacherEmail);
+                formData.append('selections', JSON.stringify(data.selections));
+                formData.append('totalSelections', data.totalSelections);
+                formData.append('timestamp', data.timestamp);
+                
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'cors'
+                });
+                
+                const result = await response.text();
+                console.log('📨 Réponse FormData:', result);
+                
+                try {
+                    return JSON.parse(result);
+                } catch {
+                    if (result.includes('success') || response.ok) {
+                        return { success: true, message: 'Données envoyées via FormData' };
+                    }
+                    return { success: false, error: 'Erreur FormData: ' + result.substring(0, 100) };
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur méthode FormData:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Méthode 3: Envoi avec GET (paramètres URL)
+        async function sendWithGET(data) {
+            try {
+                console.log('📡 Envoi avec GET...');
+                const params = new URLSearchParams({
+                    teacherName: data.teacherName,
+                    teacherEmail: data.teacherEmail,
+                    selections: JSON.stringify(data.selections),
+                    totalSelections: data.totalSelections,
+                    timestamp: data.timestamp
+                });
+                
+                const url = `${GOOGLE_APPS_SCRIPT_URL}?${params.toString()}`;
+                console.log('🔗 URL GET:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                const result = await response.text();
+                console.log('📨 Réponse GET:', result);
+                
+                if (response.ok) {
+                    return { success: true, message: 'Données envoyées via GET' };
+                } else {
+                    return { success: false, error: 'Erreur GET: ' + result.substring(0, 100) };
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur méthode GET:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
         function showMessage(type, message) {
             const successEl = document.getElementById('successMessage');
             const errorEl = document.getElementById('errorMessage');
             
-            // Cacher tous les messages
             successEl.style.display = 'none';
             errorEl.style.display = 'none';
             
-            // Afficher le bon message
             if (type === 'success') {
-                successEl.textContent = message;
+                successEl.innerHTML = message;
                 successEl.style.display = 'block';
+                // Scroll vers le message
+                successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
-                errorEl.textContent = message;
+                errorEl.innerHTML = message;
                 errorEl.style.display = 'block';
+                errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
         function resetForm() {
-            // Reset les checkboxes
+            // Reset checkboxes
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                 cb.checked = false;
             });
@@ -1079,16 +1201,36 @@
                 container.classList.remove('checked');
             });
             
-            // Reset les champs texte
+            // Reset text fields
             document.getElementById('teacherName').value = '';
             document.getElementById('teacherEmail').value = '';
             
-            // Reset la sélection
+            // Reset selections
             selectedItems = [];
             updateSummary();
+            
+            // Cacher les messages après 5 secondes
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+            }, 5000);
         }
 
-
+        // Test de connexion au chargement de la page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔍 Test de connexion au script Google...');
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, { method: 'GET' });
+                const result = await response.text();
+                if (result.includes('actif') || response.ok) {
+                    console.log('✅ Connexion au script Google OK');
+                } else {
+                    console.warn('⚠️ Connexion douteuse:', result.substring(0, 100));
+                }
+            } catch (error) {
+                console.error('❌ Impossible de se connecter au script Google:', error);
+            }
+        });
     </script>
 </body>
 </html>
