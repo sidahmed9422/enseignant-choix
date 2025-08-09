@@ -1088,21 +1088,7 @@
             updateSummary();
         }
 
-        // Alternative : Méthode avec Google Forms
-        function submitToGoogleForms() {
-            const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse';
-            
-            const formData = new FormData();
-            formData.append('entry.NAME_FIELD_ID', document.getElementById('teacherName').value);
-            formData.append('entry.EMAIL_FIELD_ID', document.getElementById('teacherEmail').value);
-            formData.append('entry.SELECTIONS_FIELD_ID', selectedItems.join(', '));
-            
-            fetch(GOOGLE_FORM_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            });
-        }
+
     </script>
 </body>
 </html>
